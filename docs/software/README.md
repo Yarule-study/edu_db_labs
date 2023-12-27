@@ -137,5 +137,185 @@ SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 ```
-- RESTfull сервіс для управління даними
+# RESTfull сервіс для управління даними
+
+## Вхідний файл програми
+```
+const express = require("express");
+const cors = require("cors");
+const router = require("./routes");
+const AppError = require("./utils/appError");
+const errorHandler = require("./utils/errorHandler");
+
+const app = express();
+app.use(express.json());
+app.use(cors());
+app.use("/api", router);
+
+app.all("*", (req, res, next) => {
+  next(new AppError(`The URL ${req.originalUrl} does not exists`, 404));
+});
+app.use(errorHandler);
+
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`server running on port ${PORT}`);
+});
+
+module.exports = app;
+```
+## Файл для встановлення доступу до бази даних
+
+```
+const mysql = require("mysql2");
+const conn = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "159357",
+  database: "mydb",
+});
+
+conn.connect();
+
+module.exports = conn;
+```
+# CRUD для користувачів
+
+## Маршрути
+
+```
+const express = require("express");
+const controllers = require("../controllers");
+const router = express.Router();
+
+router.route("/User").get(controllers.getAllUsers).post(controllers.createUser);
+router
+  .route("/User/:id")
+  .get(controllers.getUserById)
+  .put(controllers.updateUser)
+  .delete(controllers.deleteUser);
+module.exports = router;
+```
+## Контроллери
+
+```
+const AppError = require("../utils/appError");
+const conn = require("../services/db");
+
+exports.getAllUsers = (req, res, next) => {
+  conn.query("SELECT * FROM User", function (err, data, fields) {
+    if (err) return next(new AppError(err));
+    res.status(200).json({
+      status: "success",
+      length: data?.length,
+      data: data,
+    });
+  });
+};
+
+exports.createUser = (req, res, next) => {
+  if (!req.body) return next(new AppError("No form data found", 404));
+  const values = [
+    req.body.username,
+    req.body.email,
+    req.body.password,
+    req.body.Role,
+  ];
+  conn.query(
+    "INSERT INTO User (username, email, password, Role) VALUES(?)",
+    [values],
+    function (err, data, fields) {
+      if (err) return next(new AppError(err, 500));
+      res.status(201).json({
+        status: "success",
+        message: "user added!",
+      });
+    }
+  );
+};
+
+exports.getUserById = (req, res, next) => {
+  if (!req.params.id) {
+    return next(new AppError("No user id found", 404));
+  }
+  conn.query(
+    "SELECT * FROM User WHERE id = ?",
+    [req.params.id],
+    function (err, data, fields) {
+      if (err) return next(new AppError(err, 500));
+      res.status(200).json({
+        status: "success",
+        length: data?.length,
+        data: data,
+      });
+    }
+  );
+};
+
+exports.updateUser = (req, res, next) => {
+  if (!req.params.id) {
+    return next(new AppError("No user id found", 404));
+  }
+  conn.query(
+    "UPDATE User SET username=?, email=?, password=?, Role=? WHERE id=?",
+    [
+      req.body.username,
+      req.body.email,
+      req.body.password,
+      req.body.Role,
+      req.params.id,
+    ],
+    function (err, data, fields) {
+      if (err) return next(new AppError(err, 500));
+      res.status(201).json({
+        status: "success",
+        message: "user info updated!",
+      });
+    }
+  );
+};
+
+exports.deleteUser = (req, res, next) => {
+  if (!req.params.id) {
+    return next(new AppError("No todo id found", 404));
+  }
+  conn.query(
+    "DELETE FROM User WHERE id=?",
+    [req.params.id],
+    function (err, fields) {
+      if (err) return next(new AppError(err, 500));
+      res.status(201).json({
+        status: "success",
+        message: "user deleted!",
+      });
+    }
+  );
+};
+```
+## Обробники помилок
+
+```
+class AppError extends Error {
+    constructor(msg, statusCode) {
+      super(msg);
+  
+      this.statusCode = statusCode;
+      this.error = `${statusCode}`.startsWith("4") ? "fail" : "error";
+      this.isOperational = true;
+  
+      Error.captureStackTrace(this, this.constructor);
+    }
+  }
+module.exports = AppError;
+```
+```
+module.exports = (err, req, res, next) => {
+    err.statusCode = err.statusCode || 500;
+    err.status = err.status || "error";
+    res.status(err.statusCode).json({
+      status: err.status,
+      message: err.message,
+    });
+  };
+```
 
