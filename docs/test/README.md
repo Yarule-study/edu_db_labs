@@ -2,7 +2,7 @@
 
 ## Запуск Сервера
 
-![Alt text](https://imgur.com/a/8UDCe5c.jpeg)
+![Alt text](https://imgur.com/r5bhuEU.jpeg)
 
 ## Тестування для користувача
 
@@ -17,7 +17,7 @@
 ### POST /users
 
 ![Alt text](https://imgur.com/i490k3i.jpeg)
-![Alt text](https://imgur.com/undefined.jpeg)
+![Alt text](https://imgur.com/r495a7C.jpeg)
 
 ### PUT /users/:id
 
