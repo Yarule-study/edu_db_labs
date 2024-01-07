@@ -1,7 +1,7 @@
 # Реалізація інформаційного та програмного забезпечення
 
 В рамках проекту розробляється: 
-- SQL-скрипт для створення на початкового наповнення бази даних
+## SQL-скрипт для створення на початкового наповнення бази даних
 ```sql
 -- MySQL Workbench Forward Engineering
 
@@ -137,9 +137,9 @@ SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 ```
-# RESTfull сервіс для управління даними
+## RESTfull сервіс для управління даними
 
-## Вхідний файл програми
+### Вхідний файл програми
 ```js
 const express = require("express");
 const cors = require("cors");
@@ -164,14 +164,14 @@ app.listen(PORT, () => {
 
 module.exports = app;
 ```
-## Файл для встановлення доступу до бази даних
+### Файл для встановлення доступу до бази даних
 
 ```js
 const mysql = require("mysql2");
 const conn = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "159357",
+  password: "1111",
   database: "mydb",
 });
 
@@ -179,9 +179,9 @@ conn.connect();
 
 module.exports = conn;
 ```
-# CRUD для користувачів
+### CRUD для користувачів
 
-## Маршрути
+#### Маршрути
 
 ```js
 const express = require("express");
@@ -201,7 +201,7 @@ userRouter.route("/users/:id").delete(controllers.deleteUser);
 
 module.exports = userRouter;
 ```
-## Контроллери
+#### Контроллери
 
 ```js
 const AppError = require("../errors/appError");
@@ -299,7 +299,7 @@ exports.deleteUser = (req, res, next) => {
   );
 };
 ```
-## Обробники помилок
+#### Обробники помилок
 
 ```js
 class AppError extends Error {
