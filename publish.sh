@@ -13,6 +13,7 @@ cd docs/.vuepress/dist
 # echo 'www.example.com' > CNAME
 
 git init
+git checkout -b gh-pages
 git add -A
 git commit -m 'deploy'
 
@@ -20,6 +21,6 @@ git commit -m 'deploy'
 # git push -f git@github.com:boldak/<USERNAME>.github.io.git master
 
 # if you are deploying to https://<USERNAME>.github.io/<REPO>
-git push -f https://github.com/Yarule-study/edu_db_labs master:gh-pages
-
+git remote add origin https://github.com/Yarule-study/edu_db_labs
+git push -u -f origin gh-pages
 cd -
